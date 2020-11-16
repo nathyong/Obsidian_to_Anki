@@ -1421,26 +1421,39 @@ class Directory:
             self.file_class = RegexFile
         else:
             self.file_class = File
-        os.chdir(self.path)
+
+        # os.chdir(self.path)
+        # if onefile:
+        #     # Hence, just one file to do
+        #     self.files = [self.file_class(onefile)]
+        # else:
+        #     with os.scandir() as it:
+        #         self.files = sorted(
+        #             [
+        #                 self.file_class(entry.path)
+        #                 for entry in it
+        #                 if entry.is_file() and os.path.splitext(
+        #                     entry.path
+        #                 )[1] in App.SUPPORTED_EXTS
+        #             ], key=lambda file: [
+        #                 int(part) if part.isdigit() else part.lower()
+        #                 for part in re.split(r'(\d+)', file.filename)]
+        #         )
+        # for file in self.files:
+        #     file.scan_file()
+        # os.chdir(self.parent)
+
         if onefile:
-            # Hence, just one file to do
             self.files = [self.file_class(onefile)]
         else:
-            with os.scandir() as it:
-                self.files = sorted(
-                    [
-                        self.file_class(entry.path)
-                        for entry in it
-                        if entry.is_file() and os.path.splitext(
-                            entry.path
-                        )[1] in App.SUPPORTED_EXTS
-                    ], key=lambda file: [
-                        int(part) if part.isdigit() else part.lower()
-                        for part in re.split(r'(\d+)', file.filename)]
-                )
+            from pathlib import Path
+            self.files = sorted(
+                [self.file_class(str(p.resolve())) for p in Path(abspath).rglob("*.md")],
+                key=lambda file: [int(part) if part.isdigit() else part.lower()
+                                  for part in re.split(r'(\d+)', file.filename)],
+            )
         for file in self.files:
             file.scan_file()
-        os.chdir(self.parent)
 
     def requests_1(self):
         """Get the 1st HTTP request for this directory."""
