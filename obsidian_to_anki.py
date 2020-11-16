@@ -1511,9 +1511,11 @@ class Directory:
         for note_ids, file in zip(new_note_ids, self.files):
             file.note_ids = AnkiConnect.parse(note_ids)
             if None in file.note_ids:
-                raise RuntimeError("Could not add note: {}".format(file.notes_to_add[file.note_ids.index(None)]))
+                raise RuntimeError("Note already exists in file {}: {}".format(file.filename, file.notes_to_add[file.note_ids.index(None)]))
         for card_ids, file in zip(edit_note_ids, self.files):
             file.card_ids = AnkiConnect.parse(card_ids)
+            if {} in file.card_ids:
+                raise RuntimeError("Note has been deleted in file {}: {}".format(file.filename, file.notes_to_edit[file.card_ids.index({})]))
         for file in self.files:
             file.tags = tags
         os.chdir(self.path)
