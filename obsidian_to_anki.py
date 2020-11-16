@@ -1506,11 +1506,13 @@ class Directory:
 
     def parse_requests_1(self, requests_1_response, tags):
         response = requests_1_response
-        notes_ids = AnkiConnect.parse(response[0])
-        cards_ids = AnkiConnect.parse(response[2])
-        for note_ids, file in zip(notes_ids, self.files):
+        new_note_ids = AnkiConnect.parse(response[0])
+        edit_note_ids = AnkiConnect.parse(response[2])
+        for note_ids, file in zip(new_note_ids, self.files):
             file.note_ids = AnkiConnect.parse(note_ids)
-        for card_ids, file in zip(cards_ids, self.files):
+            if None in file.note_ids:
+                raise RuntimeError("Could not add note: {}".format(file.notes_to_add[file.note_ids.index(None)]))
+        for card_ids, file in zip(edit_note_ids, self.files):
             file.card_ids = AnkiConnect.parse(card_ids)
         for file in self.files:
             file.tags = tags
