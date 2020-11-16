@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Script for adding cards to Anki from Obsidian."""
 
 import re
